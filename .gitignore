@@ -8,3 +8,10 @@ yarn.lock
 # folders
 build
 node_modules
+
+# temporary stuff
+src/temp/
+src/simc-results
+
+# private stuff
+src/config.json
