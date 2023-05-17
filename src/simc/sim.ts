@@ -1,6 +1,7 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process"
 import * as path from "path";
 import * as fs from "fs";
+import * as utilities from "../utilities.ts";
 
 function findSimExecutable() {
 	const dir = fs.readdirSync("../").filter((dir) => {
@@ -15,7 +16,7 @@ export function Sim(simString: string, id: string): ChildProcessWithoutNullStrea
 
 	/* simc.exe filepath.txt */
 
-	const tempFilePath = path.resolve(path.join("src", "temp", id));
+	const tempFilePath = path.join(utilities.getDirectory(utilities.LocalDirectories.TEMPORARY_FILES), id);
 	fs.writeFileSync(tempFilePath, simString);
 
 	const process = spawn(`${simExec}`, [tempFilePath])

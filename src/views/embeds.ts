@@ -1,5 +1,5 @@
 import { APIEmbedField, EmbedBuilder, User } from "discord.js";
-import { GeneratorSegmentType, ResultType } from "./formatter";
+import { GeneratorSegmentType, ResultType } from "../simc/formatter";
 
 export const GeneratorEmbed = (segment: GeneratorSegmentType, user: User) => {
 	const fillChar = "█"

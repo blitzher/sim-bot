@@ -2,7 +2,7 @@ import { dirname, importx } from "@discordx/importer";
 import type { Interaction, Message } from "discord.js";
 import { IntentsBitField } from "discord.js";
 import { Client } from "discordx";
-import config from "./config.json"
+import config from "./config.json" assert {type: "json"}
 
 export const bot = new Client({
   // To use only guild command
@@ -50,7 +50,6 @@ bot.on("messageCreate", (message: Message) => {
 
 async function run() {
   // The following syntax should be used in the commonjs environment
-  //
   // await importx(__dirname + "/{events,commands}/**/*.{ts,js}");
 
   // The following syntax should be used in the ECMAScript environment

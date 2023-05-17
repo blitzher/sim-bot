@@ -10,8 +10,8 @@ build
 node_modules
 
 # temporary stuff
-src/temp/
 src/simc-results
+temp/
 
 # private stuff
 src/config.json
