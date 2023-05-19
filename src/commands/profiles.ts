@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, CommandInteraction } from "discord.js";
 import { Discord, Slash, SlashOption } from "discordx";
-import * as utilities from "../utilities.ts";
+import * as utilities from "../utilities.js";
 import * as fs from "fs"
 import * as path from "path";
 

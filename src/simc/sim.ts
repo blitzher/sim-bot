@@ -1,7 +1,7 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process"
 import * as path from "path";
 import * as fs from "fs";
-import * as utilities from "../utilities.ts";
+import * as utilities from "../utilities.js";
 
 function findSimExecutable() {
 	const dir = fs.readdirSync("../").filter((dir) => {

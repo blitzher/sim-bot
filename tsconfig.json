@@ -12,11 +12,10 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "Node",
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
     "esModuleInterop": true,
     "lib": [
-      "ES2020", "ESNext"
+      "ES2020",
+      "ESNext"
     ]
   }
 }

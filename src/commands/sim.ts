@@ -1,10 +1,10 @@
 import { ApplicationCommandOptionType, CommandInteraction } from "discord.js";
 import { Discord, Slash, SlashOption } from "discordx";
-import { Sim } from "../simc/sim.ts";
+import { Sim } from "../simc/sim.js";
 import { writeFileSync } from "fs";
-import { Formatter, FormatType } from "../simc/formatter.ts";
-import { GeneratorEmbed, ResultEmbed } from "../views/embeds.ts";
-import * as utilities from "../utilities.ts";
+import { Formatter, FormatType } from "../simc/formatter.js";
+import { GeneratorEmbed, ResultEmbed } from "../views/embeds.js";
+import * as utilities from "../utilities.js";
 
 @Discord()
 export class SimSlash {

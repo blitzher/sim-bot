@@ -4,12 +4,13 @@
   "private": true,
   "license": "MIT",
   "main": "build/main.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "build:changelog": "npx @discordx/changelog --src src",
     "dev": "ts-node-esm src/main.ts",
     "start": "node build/main.js",
+    "go": "yarn build && yarn start",
     "watch": "nodemon --exec ts-node-esm src/main.ts"
   },
   "dependencies": {
