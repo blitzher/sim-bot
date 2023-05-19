@@ -2,7 +2,7 @@ import { dirname, importx } from "@discordx/importer";
 import type { Interaction, Message } from "discord.js";
 import { IntentsBitField } from "discord.js";
 import { Client } from "discordx";
-import config from "./config.json" assert {type: "json"}
+import config from "./config.json" assert {type: "json"};
 
 export const bot = new Client({
   // To use only guild command

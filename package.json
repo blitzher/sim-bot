@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "license": "MIT",
-  "type": "module",
   "main": "build/main.js",
+  "type":"module",
   "scripts": {
     "build": "tsc",
     "build:changelog": "npx @discordx/changelog --src src",
@@ -13,7 +13,7 @@
     "watch": "nodemon --exec ts-node-esm src/main.ts"
   },
   "dependencies": {
-    "@discordx/importer": "^1.1.10",
+    "@discordx/importer": "^1.2.2",
     "discord.js": "^14.11.0",
     "discordx": "^11.7.6"
   },
