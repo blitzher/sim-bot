@@ -3,9 +3,9 @@ import * as fs from "fs";
 
 
 export const ErrorReplies = {
-	INVALID_PROFILE: "Could not read profile string. Make sure you used the *nb* argument and did not alter the profile before adding it",
-	EXISTING_PROFILE: "Profile could not be added, as a profile with that name already exists. If you meant to update it, please use the /updateprofile command.",
-	NON_EXISTING_PROFILE: "Profile could not be updated, as a profile with that name does not exist. If you meant to add it, please use the /addprofile command."
+	PROFILE_INVALID: "Could not read profile string. Make sure you used the *nb* argument and did not alter the profile before adding it",
+	PROFILE_ALREADY_EXISTS: "Profile could not be added, as a profile with that name already exists. If you meant to update it, please use the /updateprofile command.",
+	PROFILE_NOT_FOUND: (profileName: string) => `Profile \`${profileName}\`could not be found. If you meant to add it, please use the /addprofile command.`
 }
 
 export enum LocalDirectories {
