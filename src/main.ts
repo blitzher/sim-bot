@@ -51,8 +51,8 @@ bot.on("messageCreate", (message: Message) => {
 
 async function initialiseWoWClient() {
   const wowClient = await wow.createInstance({
-    key: config.wowClientId,
-    secret: config.wowClientSecret,
+    key: config.TOKENS.WOW_CLIENT_ID,
+    secret: config.TOKENS.WOW_CLIENT_SECRET,
     origin: 'eu',
     locale: 'en_GB'
   });
@@ -61,15 +61,15 @@ async function initialiseWoWClient() {
 }
 
 async function initialiseDiscordClient() {
-  if (!config.token) throw Error("Missing discord token.");
-  await bot.login(config.token);
+  if (!config.TOKENS.BOT_TOKEN) throw Error("Missing discord token.");
+  await bot.login(config.TOKENS.BOT_TOKEN);
 
   console.log('Discord client succesful initialised');
 }
 
 async function initialise() {
-  await initialiseDiscordClient();
   await initialiseWoWClient();
+  await initialiseDiscordClient();
 }
 
 async function run() {

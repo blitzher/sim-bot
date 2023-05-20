@@ -5,20 +5,8 @@ import { writeFileSync } from "fs";
 import { Formatter, FormatType } from "../simc/formatter.js";
 import { GeneratorEmbed, ResultEmbed } from "../views/embeds.js";
 import * as utilities from "../utilities.js";
+import config from "../config.json" assert { type: "json" };
 
-
-function resolveSimulationProfile(interaction: CommandInteraction, argument: string) {
-  let profile = utilities.getUserProfile(interaction.user.id, argument);
-  if (!profile) {
-    profile = utilities.minimizeSimcProfile(argument)
-    if (!profile) {
-      interaction.reply(utilities.ErrorReplies.PROFILE_INVALID);
-      throw (`Could not find profile: ${argument} for user: ${interaction.user.id}`);
-    }
-  }
-
-  return profile;
-}
 
 @Discord()
 export class SimSlash {
@@ -33,24 +21,26 @@ export class SimSlash {
     argument: string,
     interaction: CommandInteraction): Promise<void> {
     try {
-      const profile = resolveSimulationProfile(interaction, argument);
+      const profile = utilities.resolveSimulationProfile(interaction.user.id, argument);
 
+      /* Let user known that the sim is starting */
       const reply = await interaction.reply("Starting simulation...");
       const simId = interaction.user.id;
 
+      /* Start child process and create a new formatter for reading output from simc stdout stream */
       const process = Sim(profile, simId);
       const formatter = new Formatter(simId);
 
-      /* Feed data from sim process into formatter */
       process.stdout.on('data', (data: Buffer) => {
         formatter.feed(data.toString());
       })
 
+      /* Ensure that formatter is not spamming discord API with  */
       let lastUpdate = Date.now();
       formatter.on(FormatType.GeneratorProgress, (progress) => {
         const now = Date.now();
         const dt = now - lastUpdate;
-        if (dt > 1000) {
+        if (dt > config.CONSTANTS.GENERATOR_MSG_MIN_DELAY) {
           reply.edit({
             embeds: [GeneratorEmbed(progress, interaction.user)]
           })
@@ -58,6 +48,7 @@ export class SimSlash {
         }
       })
 
+      /*  */
       formatter.on(FormatType.Result, (result) => {
         reply.edit({
           embeds: [ResultEmbed(result, interaction.user)]
@@ -65,7 +56,13 @@ export class SimSlash {
       })
     }
     catch (err) {
-      console.log(err);
+      if (err instanceof utilities.UserError) {
+        interaction.reply(err.message);
+      }
+      else {
+        interaction.reply(utilities.ErrorReplies.ERROR_UNKNOWN)
+        console.log(err);
+      }
     }
   }
 }

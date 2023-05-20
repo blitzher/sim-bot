@@ -8,7 +8,7 @@ import * as Embeds from "../views/embeds.js";
 
 @Discord()
 export class Comparator {
-	@Slash({ description: "Save a profile for quick simming", name: "addprofile" })
+	@Slash({ description: "Start an item comparison", name: "compare" })
 	async compare(
 		@SlashOption({
 			name: "profile-name",

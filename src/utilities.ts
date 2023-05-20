@@ -5,8 +5,14 @@ import * as fs from "fs";
 export const ErrorReplies = {
 	PROFILE_INVALID: "Could not read profile string. Make sure you used the *nb* argument and did not alter the profile before adding it",
 	PROFILE_ALREADY_EXISTS: "Profile could not be added, as a profile with that name already exists. If you meant to update it, please use the /updateprofile command.",
-	PROFILE_NOT_FOUND: (profileName: string) => `Profile \`${profileName}\`could not be found. If you meant to add it, please use the /addprofile command.`
+	PROFILE_NOT_FOUND: (profileName: string) => `Profile \`${profileName}\`could not be found. If you meant to add it, please use the /addprofile command.`,
+
+	ERROR_UNKNOWN: "Unknown error occured",
 }
+
+
+/* User error class */
+export class UserError extends Error { }
 
 export enum LocalDirectories {
 	PROFILES,
@@ -54,5 +60,17 @@ export const getUserProfile = (id: string, profileName: string) => {
 	if (!fs.existsSync(fullPath))
 		return;
 	const profile = fs.readFileSync(fullPath).toString();
+	return profile;
+}
+
+export const resolveSimulationProfile = (userId: string, argument: string) => {
+	let profile = getUserProfile(userId, argument);
+	if (!profile) {
+		profile = minimizeSimcProfile(argument)
+		if (!profile) {
+			throw new UserError(ErrorReplies.PROFILE_INVALID);
+		}
+	}
+
 	return profile;
 }
