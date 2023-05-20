@@ -6,6 +6,21 @@ import { Formatter, FormatType } from "../simc/formatter.js";
 import { GeneratorEmbed, ResultEmbed } from "../views/embeds.js";
 import * as utilities from "../utilities.js";
 
+
+function resolveSimulationProfile(interaction:CommandInteraction, argument:string)
+{
+  let profile = utilities.getUserProfile(interaction.user.id, argument);
+  if (!profile) {
+    profile = utilities.minimizeSimcProfile(argument)
+    if (!profile) {
+      interaction.reply(utilities.ErrorReplies.INVALID_PROFILE);
+      throw(`Could not find profile: ${argument} for user: ${interaction.user.id}`);
+    }
+  }
+
+  return profile;
+}
+
 @Discord()
 export class SimSlash {
   @Slash({ description: "Sim an arbitrary string" })
@@ -18,17 +33,8 @@ export class SimSlash {
     })
     argument: string,
     interaction: CommandInteraction): Promise<void> {
-
-    /* Look for existing profile */
-    let profile = utilities.getUserProfile(interaction.user.id, argument);
-    if (!profile) {
-      /* Try to find profile in argument */
-      profile = utilities.minimizeSimcProfile(argument)
-      if (!profile) {
-        interaction.reply(utilities.ErrorReplies.INVALID_PROFILE);
-        return;
-      }
-    }
+      try{
+    const profile = resolveSimulationProfile(interaction, argument);
 
     const reply = await interaction.reply("Starting simulation...");
     const simId = interaction.user.id;
@@ -58,6 +64,9 @@ export class SimSlash {
         embeds: [ResultEmbed(result, interaction.user)]
       })
     })
-
+  }
+  catch(err){
+    console.log(err);
+  }
   }
 }
