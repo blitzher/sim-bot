@@ -31,3 +31,7 @@ export const ResultEmbed = (results: ResultType[], user: User) => {
 		.setDescription(`Results for ${user.tag}`)
 		.setFields(fields)
 }
+
+export const CompareMenu = () => {
+	return new EmbedBuilder();
+}

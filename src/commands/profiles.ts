@@ -28,14 +28,14 @@ export class Profiles {
 		const profilePath = path.join(profileDirectory, profileName);
 
 		if (fs.existsSync(profilePath)) {
-			await interaction.reply(utilities.ErrorReplies.EXISTING_PROFILE);
+			await interaction.reply(utilities.ErrorReplies.PROFILE_ALREADY_EXISTS);
 			return;
 		}
 
 		const minimizedProfile = utilities.minimizeSimcProfile(profile);
 
 		if (!minimizedProfile) {
-			await interaction.reply(utilities.ErrorReplies.INVALID_PROFILE)
+			await interaction.reply(utilities.ErrorReplies.PROFILE_INVALID)
 			return;
 		}
 
@@ -67,14 +67,14 @@ export class Profiles {
 		const profilePath = path.join(profileDirectory, profileName);
 
 		if (!fs.existsSync(profilePath)) {
-			await interaction.reply(utilities.ErrorReplies.NON_EXISTING_PROFILE);
+			await interaction.reply(utilities.ErrorReplies.PROFILE_NOT_FOUND(profileName));
 			return;
 		}
 
 		const minimizedProfile = utilities.minimizeSimcProfile(profile);
 
 		if (!minimizedProfile) {
-			await interaction.reply(utilities.ErrorReplies.INVALID_PROFILE)
+			await interaction.reply(utilities.ErrorReplies.PROFILE_INVALID)
 			return;
 		}
 

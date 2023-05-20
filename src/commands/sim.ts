@@ -25,7 +25,7 @@ export class SimSlash {
       /* Try to find profile in argument */
       profile = utilities.minimizeSimcProfile(argument)
       if (!profile) {
-        interaction.reply(utilities.ErrorReplies.INVALID_PROFILE);
+        interaction.reply(utilities.ErrorReplies.PROFILE_INVALID);
         return;
       }
     }
