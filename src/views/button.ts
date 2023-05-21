@@ -1,14 +1,13 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from 'discord.js';
+import { ActionRow, ActionRowBuilder, ActionRowData, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, MessageActionRowComponentData, SlashCommandBuilder } from 'discord.js';
 
 export const CompareButtons = () => {
-	return new ActionRowBuilder()
-		.addComponents(SearchItemButton(), RunSimButton())
-}
-
-export const SearchItemButton = () => {
-	return new ButtonBuilder();
+	return new ActionRowBuilder<MessageActionRowComponentBuilder>()
+		.addComponents(RunSimButton())
 }
 
 export const RunSimButton = () => {
-	return new ButtonBuilder();
+	return new ButtonBuilder()
+		.setLabel("Run Sim")
+		.setCustomId('run-sim')
+		.setStyle(ButtonStyle.Primary);
 }

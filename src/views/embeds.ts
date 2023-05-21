@@ -1,5 +1,7 @@
 import { APIEmbedField, EmbedBuilder, User } from "discord.js";
 import { GeneratorSegmentType, ResultType } from "../simc/formatter";
+import { SimCProfile } from "../simcprofile";
+import { CompareProfile } from "../commands/compare";
 
 export const GeneratorEmbed = (segment: GeneratorSegmentType, user: User) => {
 	const fillChar = "█"
@@ -32,6 +34,23 @@ export const ResultEmbed = (results: ResultType[], user: User) => {
 		.setFields(fields)
 }
 
-export const CompareMenu = () => {
-	return new EmbedBuilder();
+export const CompareMenu = (cmp: CompareProfile) => {
+
+	const capitalize = (str: string) => {
+		return str.charAt(0).toUpperCase() + str.slice(1);
+	}
+
+	const fields: APIEmbedField[] = cmp.copies.map((copy) => {
+		return {
+			name: copy.name,
+			value: copy.items.map((item) => `${item.name || 'Some item'} (${item.id})`).join("\n")
+		}
+	})
+
+	return new EmbedBuilder()
+		.setTitle(cmp.profile.name)
+		.setDescription(`${capitalize(cmp.profile.spec)} ${capitalize(cmp.profile.class)}\nTalents: \`${cmp.profile.talents}\``)
+		.setThumbnail(`http://skovboo.org:8081/class-icons/${cmp.profile.class}_round.png`)
+		.addFields(fields)
+
 }

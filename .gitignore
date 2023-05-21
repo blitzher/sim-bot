@@ -12,6 +12,7 @@ node_modules
 # temporary stuff
 src/simc-results
 temp/
+yarn-error.log
 
 # private stuff
 src/config.json

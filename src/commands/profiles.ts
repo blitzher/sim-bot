@@ -39,7 +39,7 @@ export class Profiles {
 			return;
 		}
 
-		fs.writeFile(profilePath, minimizedProfile, null, () => {
+		fs.writeFile(profilePath, minimizedProfile.fullstring, null, () => {
 			interaction.reply(`Succesfully created profile \`${profileName}\``)
 		})
 
@@ -78,8 +78,8 @@ export class Profiles {
 			return;
 		}
 
-		fs.writeFile(profilePath, minimizedProfile, null, () => {
-			interaction.reply(`Succesfully created profile ${profileName}`)
+		fs.writeFile(profilePath, minimizedProfile.fullstring, null, () => {
+			interaction.reply(`Succesfully updated profile ${profileName}`)
 		})
 
 	}

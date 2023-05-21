@@ -7,7 +7,15 @@ function findSimExecutable() {
 	const dir = fs.readdirSync("../").filter((dir) => {
 		return dir.startsWith("simc") && !dir.endsWith(".7z");
 	})
-	return path.resolve("..", path.join(dir[0], "simc.exe"));
+	const exeDir = dir[0];
+	if (!exeDir) {
+		throw new Error("Could not find simc directory.")
+	}
+	const exePath = path.resolve("..", path.join(dir[0], "simc.exe"));
+	if (!fs.existsSync(exePath)) {
+		throw new Error("Could not find simc executable");
+	}
+	return exePath;
 }
 
 export function Sim(simString: string, id: string): ChildProcessWithoutNullStreams {
