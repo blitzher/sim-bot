@@ -51,6 +51,11 @@ type EnchantmentType = {
 	}
 }
 
+type ItemType = {
+	name: string,
+	/* TODO: Complete the type */
+}
+
 type CacheConfigFile = {
 	lastUpdate: number;
 };
@@ -99,11 +104,17 @@ const updateCache = (config: CacheConfigFile) => {
 export const queryEnchantment = (query: string) => {
 	const regex = new RegExp(query, "i");
 	const enchantments = CachedFiles.ENCHANTMENTS.data;
-	for (let enchantment of enchantments) {
-		if (regex.test(enchantment.name)) return enchantment;
-	}
 
+	return enchantments.filter((enchant: EnchantmentType) => enchant.itemName.match(regex));
 }
+
+export const queryItem = (query: string) => {
+	const regex = new RegExp(query, "i");
+	const items = CachedFiles.EQUIPPABLE_ITEMS.data;
+
+	return items.filter((item: ItemType) => item.name.match(regex));
+}
+
 
 export const initialise = () => {
 	let cacheConfig = getCacheConfig();
@@ -114,6 +125,13 @@ export const initialise = () => {
 		/* Update the configs */
 		cacheConfig = updateCache(cacheConfig);
 		writeCacheConfig(cacheConfig);
+	}
+	else {
+		for (let file of Object.values(CachedFiles)) {
+			const filePath = path.join(CACHE_DIRECTORY, file.fileName)
+			const data = JSON.parse(fs.readFileSync(filePath).toString());
+			file.data = data;
+		}
 	}
 
 
