@@ -2,6 +2,9 @@ import { dirname, importx } from "@discordx/importer";
 import type { Interaction, Message } from "discord.js";
 import { IntentsBitField } from "discord.js";
 import { Client } from "discordx";
+
+import { DogWoWClient } from "./wow-client/index.js";
+
 import config from "./config.json" assert {type: "json"};
 
 export const bot = new Client({
@@ -48,6 +51,18 @@ bot.on("messageCreate", (message: Message) => {
   bot.executeCommand(message);
 });
 
+async function initialiseDiscordClient() {
+  if (!config.TOKENS.BOT_TOKEN) throw Error("Missing discord token.");
+  await bot.login(config.TOKENS.BOT_TOKEN);
+
+  console.log('Discord client succesful initialised');
+}
+
+async function initialise() {
+  await DogWoWClient.getInstance().initialise();
+  await initialiseDiscordClient();
+}
+
 async function run() {
   // The following syntax should be used in the commonjs environment
   // await importx(__dirname + "/{events,commands}/**/*.{ts,js}");
@@ -55,13 +70,8 @@ async function run() {
   // The following syntax should be used in the ECMAScript environment
   await importx(`${dirname(import.meta.url)}/{events,commands}/**/*.{ts,js}`);
 
-  // Let's start the bot
-  if (!config.token) {
-    throw Error("Could not find BOT_TOKEN in your environment");
-  }
+  await initialise();
 
-  // Log in with your bot token
-  await bot.login(config.token);
 }
 
 run();
