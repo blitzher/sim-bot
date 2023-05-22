@@ -154,15 +154,15 @@ export class Comparator {
 			UsersRunningCompares[interaction.user.id] = comparison;
 
 			const reply = await interaction.reply({
-				embeds: [Embeds.CompareMenu(comparison)],
+				embeds: [await Embeds.CompareMenu(comparison)],
 				components: [buttons],
 			});
 
 			comparison.reply = reply;
 
-			emitter.on("update", (comparison: CompareProfile) => {
+			emitter.on("update", async (comparison: CompareProfile) => {
 				interaction.editReply({
-					embeds: [Embeds.CompareMenu(comparison)],
+					embeds: [await Embeds.CompareMenu(comparison)],
 					components: [buttons],
 				});
 			});

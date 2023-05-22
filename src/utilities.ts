@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as fs from "fs";
-import { SimCProfile } from "./simcprofile";
+import { SimCProfile } from "./simcprofile.js";
 import { CommandInteraction } from "discord.js";
 
 export const ErrorReplies = {

@@ -1,7 +1,7 @@
 import { APIEmbedField, EmbedBuilder, User } from "discord.js";
-import { GeneratorSegmentType, ResultType } from "../simc/formatter";
-import { SimCProfile } from "../simcprofile";
-import { CompareProfile } from "../commands/compare";
+import { GeneratorSegmentType, ResultType } from "../simc/formatter.js";
+import { SimCProfile } from "../simcprofile.js";
+import { CompareProfile } from "../commands/compare.js";
 
 export const GeneratorEmbed = (segment: GeneratorSegmentType, user: User) => {
 	const fillChar = "█";
@@ -35,7 +35,7 @@ export const ResultEmbed = (results: ResultType[], user: User) => {
 		.setFields(fields);
 };
 
-export const CompareMenu = (cmp: CompareProfile) => {
+export const CompareMenu = async (cmp: CompareProfile) => {
 	const capitalize = (str: string) => {
 		return str.charAt(0).toUpperCase() + str.slice(1);
 	};
@@ -58,9 +58,6 @@ export const CompareMenu = (cmp: CompareProfile) => {
 		)
 		.setThumbnail(
 			`http://skovboo.org:8081/class-icons/${cmp.profile.class}_round.png`,
-		)
-		.setImage(
-			`https://www.raidbots.com/simbot/render/talents/${cmp.profile.talents}?width=300&mini=1&level=60&bgcolor=330000`,
 		)
 		.addFields(fields);
 };

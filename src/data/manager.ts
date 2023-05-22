@@ -7,6 +7,50 @@ const MS_PER_DAY = 86400000; // 24 * 60 * 60 * 1000
 const CACHE_DIRECTORY = utilities.getDirectory(utilities.LocalDirectories.DATA_CACHE);
 const CACHE_META_FILEPATH = path.join(CACHE_DIRECTORY, ".meta.json");
 
+enum CacheFileEnum {
+	ENCHANTMENTS,
+	EQUIPPABLE_ITEMS
+}
+
+
+const CachedFiles = {
+	ENCHANTMENTS: {
+		fileName: "enchantments.json",
+		endpoint: "https://www.raidbots.com/static/data/live/enchantments.json",
+		data: undefined as any,
+	},
+	EQUIPPABLE_ITEMS: {
+		fileName: "equippable-items.json",
+		endpoint: "https://www.raidbots.com/static/data/live/equippable-items.json",
+		data: undefined as any,
+	}
+}
+
+type EnchantmentType = {
+	"id": number,
+	"displayName": string,
+	"spellId": number,
+	"spellIcon": string,
+	"itemId": number,
+	"itemName": string,
+	"itemIcon": string,
+	"quality": number,
+	"expansion": number,
+	"craftingQuality": number | undefined,
+	"tokenizedName": string,
+	"stats": [
+		{
+			"type": string,
+			"amount": number
+		}
+	],
+	"equipRequirements": {
+		"itemClass": number,
+		"itemSubClassMask": number,
+		"invTypeMask": number
+	}
+}
+
 type CacheConfigFile = {
 	lastUpdate: number;
 };
@@ -20,7 +64,7 @@ const getCacheConfig = () => {
 	let cacheConfig: CacheConfigFile;
 	/* Check if the config file exists */
 	if (!fs.existsSync(CACHE_META_FILEPATH)) {
-		cacheConfig = { lastUpdate: Date.now() };
+		cacheConfig = { lastUpdate: 0 };
 		writeCacheConfig(cacheConfig);
 	} else
 		cacheConfig = JSON.parse(fs.readFileSync(CACHE_META_FILEPATH, "utf-8"));
@@ -35,17 +79,14 @@ const fetchFileFromURL = async (url: string) => {
 	return data;
 };
 
-const updateConfig = (config: CacheConfigFile) => {
-	const endpoints = [
-		"https://www.raidbots.com/static/data/live/enchantments.json",
-		"https://www.raidbots.com/static/data/live/equippable-items.json",
-	];
-	for (let endpoint of endpoints) {
-		fetchFileFromURL(endpoint).then((data) => {
-			const fileName = endpoint.split("/").pop()!;
-			console.log(`Updating ${fileName}`)
+const updateCache = (config: CacheConfigFile) => {
+	for (let file of Object.values(CachedFiles)) {
+		fetchFileFromURL(file.endpoint).then((data) => {
+
+			console.log(`Updating ${file.fileName}`)
+			file.data = data;
 			fs.writeFileSync(
-				path.join(CACHE_DIRECTORY, fileName),
+				path.join(CACHE_DIRECTORY, file.fileName),
 				JSON.stringify(data),
 			);
 		});
@@ -54,6 +95,16 @@ const updateConfig = (config: CacheConfigFile) => {
 	return config;
 };
 
+
+export const queryEnchantment = (query: string) => {
+	const regex = new RegExp(query, "i");
+	const enchantments = CachedFiles.ENCHANTMENTS.data;
+	for (let enchantment of enchantments) {
+		if (regex.test(enchantment.name)) return enchantment;
+	}
+
+}
+
 export const initialise = () => {
 	let cacheConfig = getCacheConfig();
 	const timeSinceUpdate = Date.now() - cacheConfig.lastUpdate;
@@ -61,7 +112,7 @@ export const initialise = () => {
 	/* Update the cache, if time exceeds 1 day */
 	if (timeSinceUpdate > MS_PER_DAY) {
 		/* Update the configs */
-		cacheConfig = updateConfig(cacheConfig);
+		cacheConfig = updateCache(cacheConfig);
 		writeCacheConfig(cacheConfig);
 	}
 

@@ -24,7 +24,7 @@ export async function simWithView(profile: SimCProfile | string, interaction: Co
 	})
 
 	/* Ensure that formatter is not spamming discord API with  */
-	let lastUpdate = Date.now();
+	let lastUpdate = 0;
 	formatter.on(FormatType.GeneratorProgress, (progress) => {
 		const now = Date.now();
 		const dt = now - lastUpdate;
