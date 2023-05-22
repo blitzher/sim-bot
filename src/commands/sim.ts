@@ -24,8 +24,6 @@ export class SimSlash {
     user: User,
     interaction: CommandInteraction): Promise<void> {
     try {
-
-
       const userId = user ? user.id : interaction.user.id;
       const profile = utilities.resolveSimulationProfile(userId, argument);
 

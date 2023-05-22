@@ -1,35 +1,33 @@
 import * as path from "path";
 import * as fs from "fs";
+import { SimCProfile } from "./simcprofile";
 import { CommandInteraction } from "discord.js";
-import { SimCProfile } from "./simcprofile.js";
 
 export const ErrorReplies = {
-	PROFILE_INVALID:
-		"Could not read profile string. Make sure you used the *nb* argument and did not alter the profile before adding it.",
-	PROFILE_ALREADY_EXISTS:
-		"Profile could not be added, as a profile with that name already exists. If you meant to update it, please use the /updateprofile command.",
-	PROFILE_NOT_FOUND: (profileName: string) =>
-		`Profile \`${profileName}\`could not be found. If you meant to add it, please use the /addprofile command.`,
-
-	ERROR_UNKNOWN: "Unknown error occured.",
-
+	PROFILE_INVALID: "Could not read profile string. Make sure you used the *nb* argument and did not alter the profile before adding it",
+	PROFILE_ALREADY_EXISTS: "Profile could not be added, as a profile with that name already exists. If you meant to update it, please use the /updateprofile command.",
+	PROFILE_NOT_FOUND: (profileName: string) => `Profile \`${profileName}\`could not be found. If you meant to add it, please use the /addprofile command.`,
+	INVALID_SIM_ARGUMENT: "The argument you have passed is not a valid profile name or SimC input string.",
+	CANNOT_FIND_ITEM_WOW_API: (nameOfItem: string) => `Search found no items with name ${nameOfItem}`,
 	COMPARATOR_NOT_RUNNING:
 		"Cannot run this command while a comparison is not in progress.",
-};
+	ERROR_UNKNOWN: "Unknown error occured",
+}
 
-/* User error class */
-export class UserError extends Error {}
+export class UserError extends Error { }
 
 export enum LocalDirectories {
 	PROFILES,
 	SIMC_RESULTS,
 	TEMPORARY_FILES,
+	DATA_CACHE,
 }
 
 const directories: { [key in LocalDirectories]: string[] } = {
 	0: ["profiles"],
 	1: ["src", "simc-results"],
 	2: ["temp"],
+	3: ["src", "data", "cache"],
 };
 
 export const minimizeSimcProfile = (profileString: string) => {
@@ -38,8 +36,7 @@ export const minimizeSimcProfile = (profileString: string) => {
 
 	if (!matches || matches.length == 0) return;
 
-	/* Filter out comments */
-	const filtered = matches?.filter((m) => !m.startsWith("#"));
+	const filtered = matches?.filter((m) => !m.startsWith("#"))
 	const simString = filtered?.join("\n") || "";
 
 	return new SimCProfile(simString);
@@ -95,6 +92,5 @@ export const resolveSimulationProfile = (userId: string, argument: string) => {
 			throw new UserError(ErrorReplies.PROFILE_INVALID);
 		}
 	}
-
 	return profile;
 };

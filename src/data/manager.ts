@@ -1,25 +1,29 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as utilities from "../utilities.js";
+import fetch from "node-fetch";
 
 const MS_PER_DAY = 86400000; // 24 * 60 * 60 * 1000
-const CACHE_CONFIG_FILE = path.join("src", "data", "cache", ".meta.json");
+const CACHE_DIRECTORY = utilities.getDirectory(utilities.LocalDirectories.DATA_CACHE);
+const CACHE_META_FILEPATH = path.join(CACHE_DIRECTORY, ".meta.json");
 
 type CacheConfigFile = {
 	lastUpdate: number;
 };
 
 const writeCacheConfig = (config: CacheConfigFile) => {
-	fs.writeFileSync(CACHE_CONFIG_FILE, JSON.stringify(config));
+	fs.writeFileSync(CACHE_META_FILEPATH, JSON.stringify(config));
 };
 
 const getCacheConfig = () => {
+
 	let cacheConfig: CacheConfigFile;
 	/* Check if the config file exists */
-	if (!fs.existsSync(CACHE_CONFIG_FILE)) {
+	if (!fs.existsSync(CACHE_META_FILEPATH)) {
 		cacheConfig = { lastUpdate: Date.now() };
 		writeCacheConfig(cacheConfig);
 	} else
-		cacheConfig = JSON.parse(fs.readFileSync(CACHE_CONFIG_FILE, "utf-8"));
+		cacheConfig = JSON.parse(fs.readFileSync(CACHE_META_FILEPATH, "utf-8"));
 
 	return cacheConfig;
 };
@@ -38,8 +42,10 @@ const updateConfig = (config: CacheConfigFile) => {
 	];
 	for (let endpoint of endpoints) {
 		fetchFileFromURL(endpoint).then((data) => {
+			const fileName = endpoint.split("/").pop()!;
+			console.log(`Updating ${fileName}`)
 			fs.writeFileSync(
-				path.join("src", "data", "cache", endpoint.split("/").pop()!),
+				path.join(CACHE_DIRECTORY, fileName),
 				JSON.stringify(data),
 			);
 		});
@@ -56,5 +62,8 @@ export const initialise = () => {
 	if (timeSinceUpdate > MS_PER_DAY) {
 		/* Update the configs */
 		cacheConfig = updateConfig(cacheConfig);
+		writeCacheConfig(cacheConfig);
 	}
+
+
 };

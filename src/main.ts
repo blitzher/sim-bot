@@ -1,9 +1,12 @@
 import { dirname, importx } from "@discordx/importer";
 import type { Interaction, Message } from "discord.js";
 import { Client } from "discordx";
-import { wow } from "blizzard.js";
+
+import { DogWoWClient } from "./wow-client/index.js";
+
 import config from "./config.json" assert {type: "json"};
 import * as simcprofile from "./simcprofile.js"
+import * as data from "./data/manager.js";
 
 export const bot = new Client({
   // To use only guild command
@@ -49,17 +52,6 @@ bot.on("messageCreate", (message: Message) => {
   bot.executeCommand(message);
 });
 
-async function initialiseWoWClient() {
-  const wowClient = await wow.createInstance({
-    key: config.TOKENS.WOW_CLIENT_ID,
-    secret: config.TOKENS.WOW_CLIENT_SECRET,
-    origin: 'eu',
-    locale: 'en_GB'
-  });
-
-  console.log('WoW client succesful initialised');
-}
-
 async function initialiseDiscordClient() {
   if (!config.TOKENS.BOT_TOKEN) throw Error("Missing discord token.");
   await bot.login(config.TOKENS.BOT_TOKEN);
@@ -68,8 +60,9 @@ async function initialiseDiscordClient() {
 }
 
 async function initialise() {
-  await initialiseWoWClient();
+  await DogWoWClient.getInstance().initialise();
   await initialiseDiscordClient();
+  await data.initialise();
 }
 
 async function run() {

@@ -23,10 +23,6 @@ export async function simWithView(profile: SimCProfile | string, interaction: Co
 		console.log(`stderr-data: ${err}`);
 	})
 
-
-
-
-
 	/* Ensure that formatter is not spamming discord API with  */
 	let lastUpdate = Date.now();
 	formatter.on(FormatType.GeneratorProgress, (progress) => {
