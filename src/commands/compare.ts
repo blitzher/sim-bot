@@ -1,9 +1,6 @@
 import { ActionRow, ApplicationCommandOptionType, CommandInteraction, MessageComponentInteraction } from "discord.js";
 import { Discord, Slash, SlashOption } from "discordx";
 import * as utilities from "../utilities.js";
-import * as fs from "fs"
-import * as path from "path";
-import { WoWApi } from "../wowapi/index.js";
 import * as Embeds from "../views/embeds.js";
 
 @Discord()
@@ -18,21 +15,22 @@ export class Comparator {
 		})
 		profileName: string,
 		interaction: CommandInteraction): Promise<void> {
-
-		const profile = utilities.getUserProfile(interaction.user.id, profileName);
-		if (!profile) {
-			interaction.reply(utilities.ErrorReplies.PROFILE_NOT_FOUND(profileName))
-			return
+		try {
+			const profile = utilities.getUserProfile(interaction.user.id, profileName);
+			if (!profile) {
+				interaction.reply(utilities.ErrorReplies.PROFILE_NOT_FOUND(profileName))
+				return
+			}
+			interaction.reply({ embeds: [Embeds.CompareMenu()], components: [] })
 		}
-
-		interaction.reply({ embeds: [Embeds.CompareMenu()], components: [] })
-
-
-
-
-
-
-
-
+		catch (err) {
+			if (err instanceof utilities.UserError) {
+				interaction.reply(err.message);
+			  }
+			  else {
+				interaction.reply(utilities.ErrorReplies.ERROR_UNKNOWN)
+				console.log(err);
+			  }
+		}
 	}
 }
