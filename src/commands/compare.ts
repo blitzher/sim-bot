@@ -18,7 +18,7 @@ import { SimCItem, SimCItemData, SimCProfile } from "../simcprofile.js";
 import { EventEmitter } from "events";
 import { Sim } from "../simc/sim.js";
 import { simWithView } from "../views/simView.js";
-import { InventoryTypeToSimCSlot, queryEnchantment, queryItem } from "../data/manager.js";
+import { InventoryTypeToSimCSlot, queryEnchantment, queryGem, queryItem } from "../data/manager.js";
 
 /* Temporary quick-implementation of state */
 export type CompareProfile = {
@@ -118,21 +118,34 @@ export class Comparator {
 		}
 		/* For now, only select first item found */
 		const item = queriedItems[0];
-		const itemSlot = InventoryTypeToSimCSlot(item.inventoryType);
+		let itemSlot = InventoryTypeToSimCSlot(item.inventoryType);
 		if (!itemSlot) {
-			interaction.reply(utilities.ErrorReplies.ITEM_INVALID);
+			interaction.reply({
+				content: utilities.ErrorReplies.ITEM_INVALID(itemName),
+				ephemeral: true
+			});
 			return;
 		}
-
+		if (["finger", "trinket"].includes(itemSlot) && !slot) {
+			interaction.reply({
+				content: utilities.ErrorReplies.ITEM_MISSING_SLOT(itemSlot),
+				ephemeral: true,
+			});
+			return;
+		}
+		else if (["finger", "trinket"].includes(itemSlot) && slot) {
+			itemSlot += slot;
+		}
 
 		const copy = {
-			name: item.name,
+			name: item.name + " " + slot ?? "",
 			items: [
 				{
 					name: item.name,
-					slot: slot ? itemSlot + slot : itemSlot,
+					slot: itemSlot,
 					id: item.id,
 					bonus_id: item.bonusLists,
+					ilvl: itemLevel,
 				}
 			] as SimCItemData[]
 		};
@@ -141,7 +154,7 @@ export class Comparator {
 			const gemNames = gems.split("/");
 			const gemsFound: { id: number, name: string }[] = [];
 			for (let gemName of gemNames) {
-				const gem = queryItem(gemName)[0];
+				const gem = queryGem(gemName, 3)[0];
 				if (!gem) {
 					interaction.reply({
 						content: `Gem \`${gemName}\` not found.`,
@@ -150,7 +163,7 @@ export class Comparator {
 					return;
 				}
 
-				gemsFound.push({ id: gem.id, name: gem.name });
+				gemsFound.push({ id: gem.itemId, name: gem.itemName ?? gem.displayName });
 			}
 			copy.items[0].gems = gemsFound;
 		}

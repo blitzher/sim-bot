@@ -116,6 +116,12 @@ type EnchantmentType = {
 	}
 }
 
+type GemType = {
+	id: number,
+	quality?: number,
+	itemName: string,
+}
+
 type ItemType = {
 	name: string,
 	inventoryType: InventoryType,
@@ -175,6 +181,17 @@ export const queryEnchantment = (query: string) => {
 	const enchantments = CachedFiles.ENCHANTMENTS.data;
 
 	return enchantments.filter((enchant: EnchantmentType) => enchant.displayName.match(regex));
+}
+
+export const queryGem = (query: string, quality?: number) => {
+	const regex = new RegExp(query.replace(/[^\w ]/, ''), "i");
+	const enchantments = CachedFiles.ENCHANTMENTS.data;
+
+	return enchantments.filter((gem: EnchantmentType) => {
+		if (!gem.itemName || gem.quality != quality)
+			return false;
+		return gem.itemName.replace(/[^\w ]/, '').match(regex)
+	});
 }
 
 export const queryItem = (query: string) => {

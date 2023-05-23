@@ -7,12 +7,13 @@ export const ErrorReplies = {
 	PROFILE_INVALID: "Could not read profile string. Make sure you used the *nb* argument and did not alter the profile before adding it",
 	PROFILE_ALREADY_EXISTS: "Profile could not be added, as a profile with that name already exists. If you meant to update it, please use the /updateprofile command.",
 	PROFILE_NOT_FOUND: (profileName: string) => `Profile \`${profileName}\`could not be found. If you meant to add it, please use the /addprofile command.`,
-	INVALID_SIM_ARGUMENT: "The argument you have passed is not a valid profile name or SimC input string.",
+	INVALID_SIM_ARGUMENT: "The argument you have passed is not a profile name or valid SimC input string.",
 	CANNOT_FIND_ITEM_WOW_API: (nameOfItem: string) => `Search found no items with name ${nameOfItem}`,
 	COMPARATOR_NOT_RUNNING:
 		"Cannot run this command while a comparison is not in progress.",
 	ERROR_UNKNOWN: "Unknown error occured",
-	ITEM_INVALID: "Could not find a valid item with that name."
+	ITEM_INVALID: (itemName: string) => `Could not find a valid item with the name ${itemName}.`,
+	ITEM_MISSING_SLOT: (itemName: string) => `Item ${itemName} requires a slot number 1 or 2.`
 }
 
 export class UserError extends Error { }

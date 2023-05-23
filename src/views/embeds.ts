@@ -39,9 +39,9 @@ export const ResultEmbed = (results: ResultType[], user: User) => {
 function formatItemToField(item: SimCItemData) {
 	const enchantString = item.enchant ? `\n:sparkles: ${item.enchant.name}` : "";
 	const gemsString = item.gems ? `\n:gem: ${item.gems?.map((gem) => gem.name).join("/")}` : "";
-	const itemString = item.name
+	const itemString = `**${item.name ?? "Nameless item"}**` + item.ilvl ? `(${item.ilvl})` : "";
 
-	return `${itemString}${enchantString}${gemsString}`;
+	return `**${itemString}**${enchantString}${gemsString}`;
 }
 
 export const CompareMenu = async (cmp: CompareProfile) => {
