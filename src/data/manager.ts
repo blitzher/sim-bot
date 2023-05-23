@@ -12,47 +12,116 @@ enum CacheFileEnum {
 	EQUIPPABLE_ITEMS
 }
 
+enum InventoryType {
+	NonEquip,
+	Head,
+	Neck,
+	Shoulder,
+	Shirt,
+	Chest,
+	Waist,
+	Legs,
+	Feet,
+	Wrist,
+	Hands,
+	Finger,
+	Trinket,
+	OneHand,
+	Shield,
+	Ranged,
+	Back,
+	TwoHand,
+	Bag,
+	Tabard,
+	Robe,
+	MainHand,
+	OffHand,
+	HeldInOffHand,
+	Ammo,
+	Thrown,
+	RangedRight,
+	Quiver,
+	Relic
+}
+
+export const InventoryTypeToSimCSlot = (type: InventoryType): string | void => {
+	switch (type) {
+		case InventoryType.Head:
+			return "head";
+		case InventoryType.Neck:
+			return "neck";
+		case InventoryType.Shoulder:
+			return "shoulder";
+		case InventoryType.Back:
+			return "back";
+		case InventoryType.Chest:
+			return "chest";
+		case InventoryType.Wrist:
+			return "wrist";
+		case InventoryType.Hands:
+			return "hands";
+		case InventoryType.Waist:
+			return "waist";
+		case InventoryType.Legs:
+			return "legs";
+		case InventoryType.Feet:
+			return "feet";
+		case InventoryType.Finger:
+			return "finger";
+		case InventoryType.Trinket:
+			return "trinket";
+		case InventoryType.OneHand:
+			return "main_hand";
+		case InventoryType.Shield:
+			return "off_hand";
+		case InventoryType.RangedRight:
+			return "main_hand";
+		case InventoryType.TwoHand:
+			return "main_hand";
+
+	}
+}
 
 const CachedFiles = {
 	ENCHANTMENTS: {
 		fileName: "enchantments.json",
 		endpoint: "https://www.raidbots.com/static/data/live/enchantments.json",
-		data: undefined as any,
+		data: [] as EnchantmentType[],
 	},
 	EQUIPPABLE_ITEMS: {
 		fileName: "equippable-items.json",
 		endpoint: "https://www.raidbots.com/static/data/live/equippable-items.json",
-		data: undefined as any,
+		data: [] as ItemType[],
 	}
 }
 
 type EnchantmentType = {
-	"id": number,
-	"displayName": string,
-	"spellId": number,
-	"spellIcon": string,
-	"itemId": number,
-	"itemName": string,
-	"itemIcon": string,
-	"quality": number,
-	"expansion": number,
-	"craftingQuality": number | undefined,
-	"tokenizedName": string,
-	"stats": [
-		{
-			"type": string,
-			"amount": number
-		}
-	],
-	"equipRequirements": {
-		"itemClass": number,
-		"itemSubClassMask": number,
-		"invTypeMask": number
+	id: number,
+	baseDisplayName?: string,
+	displayName: string,
+	spellId: number,
+	spellIcon: string,
+	itemId: number,
+	itemName?: string,
+	quality?: number,
+	tokenizedName: string,
+	stats: {
+		type: string,
+		amount: number
+	}[],
+	equipRequirements: {
+		itemClass: number,
+		itemSubClassMask: number,
+		invTypeMask: number
 	}
 }
 
 type ItemType = {
 	name: string,
+	inventoryType: InventoryType,
+	bonusLists: number[],
+	itemLevel: number,
+	id: number,
 	/* TODO: Complete the type */
 }
 
@@ -86,7 +155,7 @@ const fetchFileFromURL = async (url: string) => {
 
 const updateCache = (config: CacheConfigFile) => {
 	for (let file of Object.values(CachedFiles)) {
-		fetchFileFromURL(file.endpoint).then((data) => {
+		fetchFileFromURL(file.endpoint).then((data: any) => {
 
 			console.log(`Updating ${file.fileName}`)
 			file.data = data;
@@ -105,14 +174,14 @@ export const queryEnchantment = (query: string) => {
 	const regex = new RegExp(query, "i");
 	const enchantments = CachedFiles.ENCHANTMENTS.data;
 
-	return enchantments.filter((enchant: EnchantmentType) => enchant.itemName.match(regex));
+	return enchantments.filter((enchant: EnchantmentType) => enchant.displayName.match(regex));
 }
 
 export const queryItem = (query: string) => {
-	const regex = new RegExp(query, "i");
+	const regex = new RegExp(query.replace(/[^\w ]/, ''), "i");
 	const items = CachedFiles.EQUIPPABLE_ITEMS.data;
 
-	return items.filter((item: ItemType) => item.name.match(regex));
+	return items.filter((item: ItemType) => item.name.replace(/[^\w ]/, '').match(regex));
 }
 
 

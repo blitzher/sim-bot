@@ -12,6 +12,7 @@ export const ErrorReplies = {
 	COMPARATOR_NOT_RUNNING:
 		"Cannot run this command while a comparison is not in progress.",
 	ERROR_UNKNOWN: "Unknown error occured",
+	ITEM_INVALID: "Could not find a valid item with that name."
 }
 
 export class UserError extends Error { }

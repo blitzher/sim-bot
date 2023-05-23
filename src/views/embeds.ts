@@ -1,6 +1,6 @@
 import { APIEmbedField, EmbedBuilder, User } from "discord.js";
 import { GeneratorSegmentType, ResultType } from "../simc/formatter.js";
-import { SimCProfile } from "../simcprofile.js";
+import { SimCItemData, SimCProfile } from "../simcprofile.js";
 import { CompareProfile } from "../commands/compare.js";
 
 export const GeneratorEmbed = (segment: GeneratorSegmentType, user: User) => {
@@ -35,6 +35,15 @@ export const ResultEmbed = (results: ResultType[], user: User) => {
 		.setFields(fields);
 };
 
+
+function formatItemToField(item: SimCItemData) {
+	const enchantString = item.enchant ? `\n:sparkles: ${item.enchant.name}` : "";
+	const gemsString = item.gems ? `\n:gem: ${item.gems?.map((gem) => gem.name).join("/")}` : "";
+	const itemString = item.name
+
+	return `${itemString}${enchantString}${gemsString}`;
+}
+
 export const CompareMenu = async (cmp: CompareProfile) => {
 	const capitalize = (str: string) => {
 		return str.charAt(0).toUpperCase() + str.slice(1);
@@ -44,7 +53,7 @@ export const CompareMenu = async (cmp: CompareProfile) => {
 		return {
 			name: copy.name,
 			value: copy.items
-				.map((item) => `${item.name || "Some item"} (${item.id})`)
+				.map((item) => `${formatItemToField(item)}`)
 				.join("\n"),
 		};
 	});

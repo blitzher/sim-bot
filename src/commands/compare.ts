@@ -18,6 +18,7 @@ import { SimCItem, SimCItemData, SimCProfile } from "../simcprofile.js";
 import { EventEmitter } from "events";
 import { Sim } from "../simc/sim.js";
 import { simWithView } from "../views/simView.js";
+import { InventoryTypeToSimCSlot, queryEnchantment, queryItem } from "../data/manager.js";
 
 /* Temporary quick-implementation of state */
 export type CompareProfile = {
@@ -46,14 +47,16 @@ export class Comparator {
 		let simString = comparison.profile.fullstring;
 
 		for (let copy of comparison.copies) {
-			simString += `\ncopy="${copy.name},${comparison.profile.name}"`;
+			simString += `\ncopy="${copy.name.replace(/\W/, "")},${comparison.profile.name}"`;
 			for (let item of copy.items) {
 				simString += `\n${SimCItem.fullstring(item)}`;
 			}
 		}
 
 		const reply = await interaction.reply("Starting comparison...");
-		simWithView(simString, interaction, reply);
+		simWithView(simString, interaction, reply).then(() => {
+			delete UsersRunningCompares[interaction.user.id];
+		});
 	}
 
 	@Slash({ description: "Add items to comparison.", name: "additem" })
@@ -86,6 +89,15 @@ export class Comparator {
 			description: "Enchantment on the item",
 		})
 		enchant: string,
+		@SlashOption({
+			name: "slot",
+			type: ApplicationCommandOptionType.Number,
+			required: false,
+			description: "The slot of a finger or trinket",
+			minValue: 1,
+			maxValue: 2,
+		})
+		slot: number,
 		interaction: CommandInteraction,
 	): Promise<void> {
 		const comparison = UsersRunningCompares[interaction.user.id];
@@ -94,24 +106,70 @@ export class Comparator {
 			return;
 		}
 
-		// Search for item
 
-		comparison.copies.push({
-			name: "onyx_impostors_birthright",
+
+		const queriedItems = queryItem(itemName);
+		if (queriedItems.length === 0) {
+			interaction.reply({
+				content: `Item ${itemName} not found.`,
+				ephemeral: true,
+			});
+			return;
+		}
+		/* For now, only select first item found */
+		const item = queriedItems[0];
+		const itemSlot = InventoryTypeToSimCSlot(item.inventoryType);
+		if (!itemSlot) {
+			interaction.reply(utilities.ErrorReplies.ITEM_INVALID);
+			return;
+		}
+
+
+		const copy = {
+			name: item.name,
 			items: [
 				{
-					slot: "finger1",
-					id: 204398,
-					bonus_id: [6652, 7981, 1498, 8767, 8780],
-					gem_id: [192919],
-					enchant_id: 6550,
-					ilvl: 100,
-				},
-			],
-		});
+					name: item.name,
+					slot: slot ? itemSlot + slot : itemSlot,
+					id: item.id,
+					bonus_id: item.bonusLists,
+				}
+			] as SimCItemData[]
+		};
 
+		if (gems) {
+			const gemNames = gems.split("/");
+			const gemsFound: { id: number, name: string }[] = [];
+			for (let gemName of gemNames) {
+				const gem = queryItem(gemName)[0];
+				if (!gem) {
+					interaction.reply({
+						content: `Gem \`${gemName}\` not found.`,
+						ephemeral: true,
+					});
+					return;
+				}
+
+				gemsFound.push({ id: gem.id, name: gem.name });
+			}
+			copy.items[0].gems = gemsFound;
+		}
+		if (enchant) {
+			const enchantments = queryEnchantment(enchant);
+			if (enchantments.length === 0 || enchantments.length > 5) {
+				interaction.reply({
+					content: `Enchantment \`${enchant}\` not found.`,
+					ephemeral: true,
+				});
+				return;
+			}
+			const enchantment = enchantments[0];
+			copy.items[0].enchant = { id: enchantment.id, name: enchantment.displayName };
+		}
+
+		comparison.copies.push(copy);
 		interaction.reply({
-			content: `Added onyx_impostors_birthright to comparison.`,
+			content: `Added ${copy.name} to comparison.`,
 			ephemeral: true,
 		});
 		comparison.emitter.emit("update", comparison);

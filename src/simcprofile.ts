@@ -19,12 +19,19 @@ const itemSlots = [
 	"off_hand",
 ]
 
-export interface SimCItemData {
+export type SimCItemData = {
 	slot: string;
 	id: number;
 	name?: string
-	enchant_id?: number
-	gem_id?: number[]
+	enchant?: {
+		name: string,
+		id: number,
+	}
+	gems?:
+	{
+		name: string,
+		id: number
+	}[]
 	bonus_id?: number[]
 	crafted_stats?: number[]
 	crafting_quality?: number
@@ -80,11 +87,11 @@ export class SimCItem implements SimCItemData {
 	}
 
 	public static fullstring(item: SimCItemData) {
-		let base = `${item.slot}=${item.name || ''},id=${item.id}`
-		if (item.enchant_id)
-			base += `,enchant_id=${item.enchant_id}`
-		if (item.gem_id)
-			base += `,gem_id=${item.gem_id}`
+		let base = `${item.slot}=,id=${item.id}`
+		if (item.enchant)
+			base += `,enchant_id=${item.enchant.id}`
+		if (item.gems)
+			base += `,gem_id=${item.gems.map(g => g.id).join("/")}`
 		if (item.bonus_id)
 			base += `,bonus_id=${item.bonus_id.join("/")}`
 		if (item.crafted_stats)
