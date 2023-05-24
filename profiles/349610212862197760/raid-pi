@@ -24,3 +24,4 @@ finger2=,id=193671,enchant_id=6550,bonus_id=6652/9415/9144/9334/1663/8767
 trinket1=,id=193743,bonus_id=9381/6652/9144/1666/8767
 trinket2=,id=204211,bonus_id=42/7979/9334/1482/8767
 main_hand=,id=202559,enchant_id=3368,bonus_id=7979/6652/9329/1494/8767
+external_buffs.pool=power_infusion:120
