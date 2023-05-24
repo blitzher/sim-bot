@@ -25,8 +25,6 @@ export function Sim(simString: string, id: string, simOptions?: SimOptions): Chi
 
 	const simExec = findSimExecutable();
 
-	console.log(simString + "\n" + simOptions.export());
-
 	const tempFilePath = path.join(utilities.getDirectory(utilities.LocalDirectories.TEMPORARY_FILES), id);
 	fs.writeFileSync(tempFilePath, simString + "\n" + simOptions.export());
 
