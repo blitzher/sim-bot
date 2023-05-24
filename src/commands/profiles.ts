@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType, CommandInteraction } from "discord.js";
-import { Discord, Slash, SlashOption } from "discordx";
+import { ApplicationCommandOptionType, CommandInteraction, ModalSubmitInteraction, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { Discord, Slash, SlashOption, ModalComponent } from "discordx";
 import * as utilities from "../utilities.js";
 import * as fs from "fs"
 import * as path from "path";
@@ -8,21 +8,40 @@ import * as path from "path";
 export class Profiles {
 	@Slash({ description: "Save a profile for quick simming", name: "addprofile" })
 	async addProfile(
-		@SlashOption({
-			name: "profile",
-			type: ApplicationCommandOptionType.String,
-			required: true,
-			description: "The profile from the simc addon. Ensure you use the *nb* argument, i.e. use /simc nb"
-		})
-		profile: string,
-		@SlashOption({
-			name: "profile-name",
-			type: ApplicationCommandOptionType.String,
-			required: true,
-			description: "The name of of the profile"
-		})
-		profileName: string,
 		interaction: CommandInteraction): Promise<void> {
+
+		const modal = new ModalBuilder()
+			.setTitle("Add new simulation profile")
+			.setCustomId("SimProfileModal");
+
+		const profileNameInputComponent = new TextInputBuilder()
+			.setCustomId("profileNameInput")
+			.setLabel("Enter simulation profile name. eg, raid")
+			.setStyle(TextInputStyle.Short);
+
+		const rawSimcInputComponent = new TextInputBuilder()
+			.setCustomId("rawSimcInput")
+			.setLabel("Enter /simc nb string")
+			.setStyle(TextInputStyle.Paragraph);
+
+		const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+			profileNameInputComponent
+		);
+
+		const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+			rawSimcInputComponent
+		);
+
+		modal.addComponents(row1, row2);
+
+		interaction.showModal(modal);
+	}
+
+	@ModalComponent()
+	async AwesomeForm(interaction: ModalSubmitInteraction): Promise<void> {
+		const [profileName, simcString] = ["profileNameInput", "rawSimcInput"].map((id) =>
+			interaction.fields.getTextInputValue(id)
+		);
 
 		const profileDirectory = utilities.getUserProfilesDirectory(interaction.user.id);
 		const profilePath = path.join(profileDirectory, profileName);
@@ -32,7 +51,7 @@ export class Profiles {
 			return;
 		}
 
-		const minimizedProfile = utilities.minimizeSimcProfile(profile);
+		const minimizedProfile = utilities.minimizeSimcProfile(simcString);
 
 		if (!minimizedProfile) {
 			await interaction.reply(utilities.ErrorReplies.PROFILE_INVALID)
@@ -43,6 +62,7 @@ export class Profiles {
 			interaction.reply(`Succesfully created profile \`${profileName}\``)
 		})
 
+		return;
 	}
 
 	@Slash({ description: "Update an existing profile", name: "updateprofile" })
