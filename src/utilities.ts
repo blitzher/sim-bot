@@ -5,7 +5,7 @@ import { CommandInteraction } from "discord.js";
 
 export const ErrorReplies = {
 	PROFILE_INVALID: "Could not read profile string. Make sure you used the *nb* argument and did not alter the profile before adding it",
-	PROFILE_ALREADY_EXISTS: "Profile could not be added, as a profile with that name already exists. If you meant to update it, please use the /updateprofile command.",
+	PROFILE_ALREADY_EXISTS: (profileName: string) => `Profile \`${profileName}\` could not be added, as a profile with that name already exists. If you meant to update it, please use the /updateprofile command.`,
 	PROFILE_NOT_FOUND: (profileName: string) => `Profile \`${profileName}\`could not be found. If you meant to add it, please use the /addprofile command.`,
 	INVALID_SIM_ARGUMENT: "The argument you have passed is not a profile name or valid SimC input string.",
 	CANNOT_FIND_ITEM_WOW_API: (nameOfItem: string) => `Search found no items with name ${nameOfItem}`,

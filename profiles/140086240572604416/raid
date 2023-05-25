@@ -1,0 +1,15 @@
+warlock="Folted"
+level=70
+race=troll
+region=eu
+server=tarren_mill
+role=spell
+professions=jewelcrafting=100/inscription=49
+spec=demonology
+
+talents=BoQA+63P9mnDJYMkogOeTUhr8CQSkkAppERaJSk0CAAAAAKRSSCCkEJkDkiWSSOABAAAAAAJ
+
+#
+slot_high_watermarks=0:444:444/1:428:428/2:441:441/3:441:441/4:437:437/5:441:441/6:441:441/7:441:441/8:437:437/9:431:431/10:421:421/11:447:447/12:437:437/13:441:441/14:1:421/15:1:421/16:437:437
+
+#
