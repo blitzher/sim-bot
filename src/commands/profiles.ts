@@ -3,6 +3,7 @@ import { Discord, Slash, SlashOption, ModalComponent } from "discordx";
 import * as utilities from "../utilities.js";
 import * as fs from "fs"
 import * as path from "path";
+import AddProfileForm from '../views/addProfileForm.js';;
 
 @Discord()
 export class Profiles {
@@ -10,31 +11,7 @@ export class Profiles {
 	async addProfile(
 		interaction: CommandInteraction): Promise<void> {
 
-		const modal = new ModalBuilder()
-			.setTitle("Add new simulation profile")
-			.setCustomId("SimProfileModal");
-
-		const profileNameInputComponent = new TextInputBuilder()
-			.setCustomId("profileNameInput")
-			.setLabel("Enter simulation profile name. eg, raid")
-			.setStyle(TextInputStyle.Short);
-
-		const rawSimcInputComponent = new TextInputBuilder()
-			.setCustomId("rawSimcInput")
-			.setLabel("Enter /simc nb string")
-			.setStyle(TextInputStyle.Paragraph);
-
-		const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
-			profileNameInputComponent
-		);
-
-		const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(
-			rawSimcInputComponent
-		);
-
-		modal.addComponents(row1, row2);
-
-		interaction.showModal(modal);
+		interaction.showModal(AddProfileForm);
 	}
 
 	@ModalComponent()
