@@ -38,7 +38,7 @@ export class Profiles {
 	}
 
 	@ModalComponent()
-	async AwesomeForm(interaction: ModalSubmitInteraction): Promise<void> {
+	async SimProfileModal(interaction: ModalSubmitInteraction): Promise<void> {
 		const [profileName, simcString] = ["profileNameInput", "rawSimcInput"].map((id) =>
 			interaction.fields.getTextInputValue(id)
 		);
