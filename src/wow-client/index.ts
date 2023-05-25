@@ -8,12 +8,15 @@ import { UserError, ErrorReplies } from "../utilities.js";
 
 export class DogWoWClient {
     private static instance_: DogWoWClient;
-    private wowClient_: WoWClient;
+    private wowClient_!: WoWClient;
     private ourLocale_: Locales;
     private maxItemsToReturn_: number = 3;
 
     private constructor() {
         this.ourLocale_ = "en_GB";
+
+
+        console.log("WoW Client succesful initialised");
     };
 
     public static getInstance(): DogWoWClient {
@@ -23,14 +26,14 @@ export class DogWoWClient {
     }
 
     public async initialise() {
-        this.wowClient_ = await wow.createInstance({
+        wow.createInstance({
             key: config.TOKENS.WOW_CLIENT_ID,
             secret: config.TOKENS.WOW_CLIENT_SECRET,
             origin: 'eu',
             locale: 'en_GB'
+        }).then((client) => {
+            this.wowClient_ = client;
         });
-
-        console.log("WoW Client succesful initialised");
     }
 
     private getAPIDataAsWoWItem(wowItemAPIData: any): WoWItem {
@@ -77,42 +80,39 @@ export class DogWoWClient {
     }
 
     public async getDogGuild(): Promise<WoWGuild> {
-        try{
+        try {
             /*TO DO*/
             const guildSearchArguments = { realm: "tarren-mill", name: "dog-company-ltd" };
             const response = await this.wowClient_.guild(guildSearchArguments);
             const dogGuild = this.getAPIDataAsGuild(response.data);
 
-        return new Promise<WoWGuild>(resolve => {resolve(dogGuild)});
+            return new Promise<WoWGuild>(resolve => { resolve(dogGuild) });
         }
-        catch(err)
-        {
+        catch (err) {
             throw err;
         }
     }
 
-    public async getDogAchievements(): Promise<string>
-    {
-        try{
+    public async getDogAchievements(): Promise<string> {
+        try {
             /*TO DO*/
-            const myResource:'achievements' = 'achievements';
-            const guildAchievementSearchArguments = { realm: "tarren-mill", name: "dog-company-ltd", resource: myResource};
+            const myResource: 'achievements' = 'achievements';
+            const guildAchievementSearchArguments = { realm: "tarren-mill", name: "dog-company-ltd", resource: myResource };
 
-            const myRoster:'roster' = 'roster';
-            const guildRosterSearchArguments = { realm: "tarren-mill", name: "dog-company-ltd", resource: myRoster};
+            const myRoster: 'roster' = 'roster';
+            const guildRosterSearchArguments = { realm: "tarren-mill", name: "dog-company-ltd", resource: myRoster };
 
-            const myActivity:'activity' = 'activity';
-            const guildActivitySearchArguments = { realm: "tarren-mill", name: "dog-company-ltd", resource: myActivity};
+            const myActivity: 'activity' = 'activity';
+            const guildActivitySearchArguments = { realm: "tarren-mill", name: "dog-company-ltd", resource: myActivity };
 
             const achievementResponse = await this.wowClient_.guild(guildAchievementSearchArguments);
             const rosterResponse = await this.wowClient_.guild(guildRosterSearchArguments);
             const activityResponse = await this.wowClient_.guild(guildActivitySearchArguments);
 
 
-            return new Promise<string>(resolve => {resolve("found achieves")});
+            return new Promise<string>(resolve => { resolve("found achieves") });
         }
-        catch(err)
-        {
+        catch (err) {
             throw err;
         }
     }

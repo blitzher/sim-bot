@@ -1,11 +1,12 @@
 import { dirname, importx } from "@discordx/importer";
 import type { Interaction, Message } from "discord.js";
-import { IntentsBitField } from "discord.js";
 import { Client } from "discordx";
 
 import { DogWoWClient } from "./wow-client/index.js";
 
 import config from "./config.json" assert {type: "json"};
+import * as simcprofile from "./simcprofile.js"
+import * as data from "./data/manager.js";
 
 export const bot = new Client({
   // To use only guild command
@@ -61,6 +62,7 @@ async function initialiseDiscordClient() {
 async function initialise() {
   await DogWoWClient.getInstance().initialise();
   await initialiseDiscordClient();
+  await data.initialise();
 }
 
 async function run() {
@@ -68,6 +70,8 @@ async function run() {
   // await importx(__dirname + "/{events,commands}/**/*.{ts,js}");
 
   // The following syntax should be used in the ECMAScript environment
+
+
   await importx(`${dirname(import.meta.url)}/{events,commands}/**/*.{ts,js}`);
 
   await initialise();
