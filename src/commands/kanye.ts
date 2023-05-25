@@ -1,4 +1,3 @@
-import { JSONType } from "@aws-sdk/client-s3";
 import { ApplicationCommandOptionType, CommandInteraction } from "discord.js";
 import { Discord, Slash, SlashOption } from "discordx";
 import fetch from 'node-fetch';
