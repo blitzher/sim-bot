@@ -20,11 +20,30 @@ export const GeneratorEmbed = (segment: GeneratorSegmentType, user: User) => {
 		.setDescription(`${segment.name}\n\`${bar}\``);
 };
 
-export const ResultEmbed = (results: ResultType[], user: User) => {
+export const ResultEmbed = (base: string, results: ResultType[], user: User) => {
+	const baseline = results.find((result) => result.name === base);
+	if (baseline) {
+		const baselineDPS = baseline.dps;
+	}
+
 	const fields: APIEmbedField[] = results.map((result) => {
+		let dpsDiff, dpsDiffPercent;
+		if (baseline) {
+			dpsDiff = result.dps - baseline.dps;
+			dpsDiffPercent = (dpsDiff / baseline.dps) * 100;
+			dpsDiffPercent -= 1;
+		}
+
+		let resultValue = `${result.dps} DPS`;
+		if (dpsDiff && dpsDiffPercent) {
+			const sign = dpsDiff > 0 ? "+" : "";
+			const emote = dpsDiff > 0 ? ":chart_with_upwards_trend:" : ":chart_with_downwards_trend:"
+			resultValue += `(**${sign}${dpsDiff.toFixed()}** ${emote})`
+		}
+
 		return {
 			name: result.name,
-			value: `${result.dps} DPS`,
+			value: resultValue,
 			inline: true,
 		};
 	});

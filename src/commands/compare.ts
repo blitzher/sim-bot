@@ -53,8 +53,8 @@ export class Comparator {
 			}
 		}
 
-		const reply = await interaction.reply("Starting comparison...");
-		simWithView(simString, interaction, reply).then(() => {
+		const oldReply = await interaction.reply("Starting comparison...");
+		simWithView(simString, interaction, { oldReply }).then(() => {
 			delete UsersRunningCompares[interaction.user.id];
 		});
 	}
