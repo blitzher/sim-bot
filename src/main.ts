@@ -53,8 +53,10 @@ bot.on("messageCreate", (message: Message) => {
 });
 
 async function initialiseDiscordClient() {
-  if (!config.TOKENS.BOT_TOKEN) throw Error("Missing discord token.");
-  await bot.login(config.TOKENS.BOT_TOKEN);
+  const tokenToUse: "BOT_TOKEN" | "TEST_BOT_TOKEN" = <any>config.LOCAL.TOKEN_TO_USE;
+  const token = config.TOKENS[tokenToUse];
+  if (!token) throw Error("Missing discord token.");
+  await bot.login(token);
 
   console.log('Discord client succesful initialised');
 }
