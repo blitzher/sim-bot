@@ -10,12 +10,9 @@ type SimViewOptions = Partial<{
 }>;
 
 export async function simWithView(profile: SimCProfile | string, interaction: CommandInteraction | ButtonInteraction, options: SimViewOptions = {}) {
-	/* Let user known that the sim is starting */
-
 	let reply = options?.oldReply || await interaction.reply("Starting simulation...");
 	const simId = interaction.user.id;
 
-	/* Start child process and create a new formatter for reading output from simc stdout stream */
 	const parsedProfile = (profile instanceof SimCProfile) ? profile : new SimCProfile(profile);
 	const simString = (profile instanceof SimCProfile) ? profile.fullstring : profile;
 	const process = Sim(simString, simId);
@@ -28,7 +25,6 @@ export async function simWithView(profile: SimCProfile | string, interaction: Co
 		console.log(`stderr-data: ${err}`);
 	})
 
-	/* Ensure that formatter is not spamming discord API with  */
 	let lastUpdate = 0;
 	formatter.on(FormatType.GeneratorProgress, (progress) => {
 		const now = Date.now();

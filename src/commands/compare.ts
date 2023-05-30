@@ -208,7 +208,7 @@ export class Comparator {
 	): Promise<void> {
 		try {
 			const userId = user ? user.id : interaction.user.id;
-			const profile = utilities.resolveSimulationProfile(
+			const profile = await utilities.resolveSimulationProfile(
 				userId,
 				profileName,
 			);
