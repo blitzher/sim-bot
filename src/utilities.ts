@@ -51,14 +51,25 @@ export const minimizeSimcProfile = (profileString: string) => {
  * @param interaction The interaction which caused the error
  * @param error The error object
  */
-export const defaultErrorHandle = (
+
+async function tellUser(interaction: CommandInteraction, message: string){
+	if(interaction.replied)
+	{
+		await interaction.editReply(message);
+	}
+	else{
+		await interaction.reply(message);
+	}
+}
+
+export const defaultErrorHandle = async (
 	interaction: CommandInteraction,
 	error: unknown | Error,
 ) => {
 	if (error instanceof UserError) {
-		interaction.reply(error.message);
+		await tellUser(interaction, error.message);
 	} else {
-		interaction.reply(ErrorReplies.ERROR_UNKNOWN);
+		await tellUser(interaction, ErrorReplies.ERROR_UNKNOWN);
 		console.log(error);
 	}
 };
