@@ -1,36 +1,65 @@
-import { ApplicationCommandOption, ApplicationCommandOptionType, CommandInteraction, User } from "discord.js";
-import { Discord, Slash, SlashOption } from "discordx";
+import { ActionRowBuilder, CommandInteraction, MessageActionRowComponentBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction } from "discord.js";
+import { Discord, SelectMenuComponent, Slash } from "discordx";
+import { S3Uploader } from "../aws/s3Uploader.js";
 import * as utilities from "../utilities.js";
 import { simWithView } from "../views/simView.js";
-import { S3Uploader } from "../aws/s3Uploader.js";
 
 @Discord()
 export class SimSlash {
-  @Slash({ description: "Sim an arbitrary string" })
+  @Slash({ description: "Simulate the DPS of a selected profile", name: "sim" })
   async sim(
-    @SlashOption({
-      description: "The string to sim or the name of a profile",
-      name: "string",
-      required: true,
-      type: ApplicationCommandOptionType.String
-    })
-    argument: string,
-    @SlashOption({
-      description: "Tag of the user to look for profile",
-      name: "user",
-      required: false,
-      type: ApplicationCommandOptionType.User
-    })
-    user: User,
     interaction: CommandInteraction): Promise<void> {
     try {
-      const userId = user ? user.id : interaction.user.id;
-      const profile = await utilities.resolveSimulationProfile(userId, argument);
-      await simWithView(profile, interaction);
+      await interaction.deferReply({ ephemeral: true });
+
+      const s3Uploader = new S3Uploader();
+      const profilesList = await s3Uploader.listObjectsInFolder(interaction.user.id, 'cal-dev-raiderprofiles');
+
+      let profiles = [];
+
+      if (!profilesList) throw (utilities.ErrorReplies.PROFILE_LIST_ERROR);
+
+      for (let profile of profilesList) {
+        if (profile) profiles.push({ label: profile, value: profile });
+      }
+
+      const profileMenu = new StringSelectMenuBuilder()
+        .addOptions(profiles)
+        .setCustomId('profile-menu');
+
+      const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        profileMenu
+      );
+
+      interaction.editReply({
+        components: [buttonRow],
+        content: "Select profile to sim",
+      });
+
+      return;
+
     }
     catch (err) {
       utilities.defaultErrorHandle(interaction, err);
     }
   }
-}
 
+  @SelectMenuComponent({ id: "profile-menu" })
+  async runSimWithSelectedProfile(interaction: StringSelectMenuInteraction): Promise<unknown> {
+    try {
+      await interaction.deferReply();
+
+      const profileName = interaction.values[0];
+
+      const profile = await utilities.getSimProfileFromS3(interaction.user.id, profileName);
+      if (!profile) throw();
+      await simWithView(profile, interaction);
+
+      return;
+    }
+    catch (err) {
+      utilities.defaultErrorHandle(interaction, err);
+    }
+  }
+
+}

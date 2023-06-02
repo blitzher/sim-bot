@@ -1,13 +1,15 @@
 import * as path from "path";
 import * as fs from "fs";
 import { SimCProfile } from "./simcprofile.js";
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, StringSelectMenuInteraction } from "discord.js";
 import { S3Uploader } from "./aws/s3Uploader.js";
 
 export const ErrorReplies = {
 	PROFILE_INVALID: "Could not read profile string. Make sure you used the *nb* argument and did not alter the profile before adding it",
 	PROFILE_ALREADY_EXISTS: (profileName: string) => `Profile \`${profileName}\` could not be added, as a profile with that name already exists. If you meant to update it, please use the /updateprofile command.`,
 	PROFILE_NOT_FOUND: (profileName: string) => `Profile \`${profileName}\`could not be found. If you meant to add it, please use the /addprofile command.`,
+	PROFILE_RETRIEVE_FAIL: (profileName: string) => `There was an error attempting to retrieve profile \`${profileName}\``,
+	PROFILE_LIST_ERROR: "There was an error retrieving raid profiles.",
 	INVALID_SIM_ARGUMENT: "The argument you have passed is not a profile name or valid SimC input string.",
 	CANNOT_FIND_ITEM_WOW_API: (nameOfItem: string) => `Search found no items with name ${nameOfItem}`,
 	COMPARATOR_NOT_RUNNING:
@@ -76,7 +78,7 @@ export const minimizeSimcProfile = (profileString: string) => {
  * @param error The error object
  */
 export const defaultErrorHandle = (
-	interaction: CommandInteraction,
+	interaction: CommandInteraction | StringSelectMenuInteraction,
 	error: unknown | Error,
 ) => {
 	if (error instanceof UserError) {

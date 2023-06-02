@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction, InteractionResponse } from "discord.js";
+import { ButtonInteraction, CommandInteraction, InteractionResponse, StringSelectMenuInteraction } from "discord.js";
 import { Formatter, FormatType } from "../simc/formatter.js";
 import { Sim } from "../simc/sim.js";
 import { SimCProfile } from "../simcprofile.js";
@@ -9,8 +9,14 @@ type SimViewOptions = Partial<{
 	oldReply: InteractionResponse<boolean>;
 }>;
 
-export async function simWithView(profile: SimCProfile | string, interaction: CommandInteraction | ButtonInteraction, options: SimViewOptions = {}) {
-	let reply = options?.oldReply || await interaction.reply("Starting simulation...");
+export async function simWithView(profile: SimCProfile | string, interaction: CommandInteraction | ButtonInteraction | StringSelectMenuInteraction, options: SimViewOptions = {}) {
+	let reply: any;
+	if (interaction.replied) {
+		await interaction.reply("Starting simulation...");
+	}
+	else {
+		await interaction.editReply("Starting simulation..");
+	}
 	const simId = interaction.user.id;
 
 	const parsedProfile = (profile instanceof SimCProfile) ? profile : new SimCProfile(profile);
@@ -30,7 +36,7 @@ export async function simWithView(profile: SimCProfile | string, interaction: Co
 		const now = Date.now();
 		const dt = now - lastUpdate;
 		if (dt > config.CONSTANTS.GENERATOR_MSG_MIN_DELAY) {
-			reply.edit({
+			interaction.editReply({
 				embeds: [GeneratorEmbed(progress, interaction.user)]
 			});
 			lastUpdate = now;
@@ -42,7 +48,7 @@ export async function simWithView(profile: SimCProfile | string, interaction: Co
 	 * as for comparisons and such, it is important that the caller can add duplicate keys to the argument */
 	const baseName = parsedProfile.name;
 	formatter.on(FormatType.Result, (result) => {
-		reply.edit({
+		interaction.editReply({
 			embeds: [ResultEmbed(baseName, result, interaction.user)]
 		});
 	});

@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand, ListObjectsCommand } from "@aws-sdk/client-s3";
 import { initialise } from "../data/manager";
 import fs from "fs";
 
@@ -28,6 +28,21 @@ export class S3Uploader {
         const object = await this.s3Client.send(getObjectCommand);
 
         return object;
+    }
+
+    async listObjectsInFolder(key: string, bucket: string)
+    {
+        const listObjectsCommand = new ListObjectsCommand(
+            {
+                Bucket: bucket,
+                Prefix: key
+            }
+        )
+
+        const objectsResponse = await this.s3Client.send(listObjectsCommand);
+
+        const objects = objectsResponse.Contents?.map(objects => objects.Key?.replace(key + "/", ""));
+        return objects;
     }
 
     async getObjectHead(key: string, bucket: string)
