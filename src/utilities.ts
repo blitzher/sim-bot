@@ -2,6 +2,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { SimCProfile } from "./simcprofile.js";
 import { CommandInteraction } from "discord.js";
+import { S3Uploader } from "./aws/s3Uploader.js";
 
 export const ErrorReplies = {
 	PROFILE_INVALID: "Could not read profile string. Make sure you used the *nb* argument and did not alter the profile before adding it",
@@ -24,6 +25,29 @@ export enum LocalDirectories {
 	TEMPORARY_FILES,
 	DATA_CACHE,
 }
+
+export const getDirectory = (key: LocalDirectories) => {
+	const fullPath = path.resolve(path.join(...directories[key]));
+	if (!fs.existsSync(fullPath)) fs.mkdirSync(fullPath, { recursive: true });
+	return fullPath;
+};
+
+export const getUserProfilesDirectory = (id: string) => {
+	const fullPath = path.join(getDirectory(LocalDirectories.PROFILES), id);
+	if (!fs.existsSync(fullPath)) fs.mkdirSync(fullPath, { recursive: true });
+	return fullPath;
+};
+
+export const getUserProfile = (id: string, profileName: string) => {
+	const fullPath = path.join(
+		getDirectory(LocalDirectories.PROFILES),
+		id,
+		profileName,
+	);
+	if (!fs.existsSync(fullPath)) return;
+	const profile = new SimCProfile(fs.readFileSync(fullPath).toString());
+	return profile;
+};
 
 const directories: { [key in LocalDirectories]: string[] } = {
 	0: ["profiles"],
@@ -74,31 +98,20 @@ export const defaultErrorHandle = async (
 	}
 };
 
-export const getDirectory = (key: LocalDirectories) => {
-	const fullPath = path.resolve(path.join(...directories[key]));
-	if (!fs.existsSync(fullPath)) fs.mkdirSync(fullPath, { recursive: true });
-	return fullPath;
-};
+export const getSimProfileFromS3 = async (userId: string, profileName: string) => {
+	try {
+		const s3Client = new S3Uploader();
+		const profileResponse = await s3Client.getObject(userId + '/' + profileName, "cal-dev-raiderprofiles");
+		const profileString = await profileResponse?.Body?.transformToString();
+		if(profileString) return new SimCProfile(profileString);
+	}
+	catch (err) {
+		return undefined; //Add logger here once it's been implemented
+	}
+}
 
-export const getUserProfilesDirectory = (id: string) => {
-	const fullPath = path.join(getDirectory(LocalDirectories.PROFILES), id);
-	if (!fs.existsSync(fullPath)) fs.mkdirSync(fullPath, { recursive: true });
-	return fullPath;
-};
-
-export const getUserProfile = (id: string, profileName: string) => {
-	const fullPath = path.join(
-		getDirectory(LocalDirectories.PROFILES),
-		id,
-		profileName,
-	);
-	if (!fs.existsSync(fullPath)) return;
-	const profile = new SimCProfile(fs.readFileSync(fullPath).toString());
-	return profile;
-};
-
-export const resolveSimulationProfile = (userId: string, argument: string) => {
-	let profile = getUserProfile(userId, argument);
+export const resolveSimulationProfile = async (userId: string, argument: string) => {
+	let profile = await getSimProfileFromS3(userId, argument);
 	if (!profile) {
 		profile = minimizeSimcProfile(argument);
 		if (!profile) {

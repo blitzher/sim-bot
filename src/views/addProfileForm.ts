@@ -1,8 +1,8 @@
 import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 
-const addProfileForm = (id: string) =>
+const addProfileForm = (id: string, title: string) =>
 	new ModalBuilder()
-		.setTitle("Add new simulation profile")
+		.setTitle(title)
 		.setCustomId(id)
 		.addComponents(row1(), row2());
 

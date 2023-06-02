@@ -2,7 +2,7 @@ import { ApplicationCommandOption, ApplicationCommandOptionType, CommandInteract
 import { Discord, Slash, SlashOption } from "discordx";
 import * as utilities from "../utilities.js";
 import { simWithView } from "../views/simView.js";
-
+import { S3Uploader } from "../aws/s3Uploader.js";
 
 @Discord()
 export class SimSlash {
@@ -25,8 +25,7 @@ export class SimSlash {
     interaction: CommandInteraction): Promise<void> {
     try {
       const userId = user ? user.id : interaction.user.id;
-      const profile = utilities.resolveSimulationProfile(userId, argument);
-
+      const profile = await utilities.resolveSimulationProfile(userId, argument);
       await simWithView(profile, interaction);
     }
     catch (err) {
