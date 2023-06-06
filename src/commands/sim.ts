@@ -52,7 +52,7 @@ export class SimSlash {
       const profileName = interaction.values[0];
 
       const profile = await utilities.getSimProfileFromS3(interaction.user.id, profileName);
-      if (!profile) throw();
+      if (!profile) throw(utilities.ErrorReplies.PROFILE_NOT_FOUND);
       await simWithView(profile, interaction);
 
       return;
